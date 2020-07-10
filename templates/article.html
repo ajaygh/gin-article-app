@@ -1,0 +1,12 @@
+<!-- index.html -->
+
+{{ template "header.html" .}}
+
+<a href="/article/view/{{.ID}}">
+	<!-- Display the title of the article -->
+	<h2>{{.title}}</h2>
+</a>
+
+<!-- Display the content of the article -->
+<p>{{.content}}</p>
+{{ template "footer.html" .}}
