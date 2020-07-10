@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -26,4 +28,44 @@ func TestShowIndexPageUnauthenticated(t *testing.T) {
 
 		return statusOK && pageOK
 	})
+}
+
+func TestGetArticleJSON(t *testing.T) {
+	r := getRouter(true)
+
+	articleID := 1
+	route := fmt.Sprintf("/view/article/%d", articleID)
+	r.GET("/article/view/:articleID", showIndexPage)
+
+	// Create a request to send to the above route
+	req, _ := http.NewRequest(http.MethodGet, route, nil)
+	req.Header.Set("accept", "application/json")
+
+	expectedArticle, _ := getArticleByID(articleID)
+
+	testHTTPResponse(t, r, req, func(w *httptest.ResponseRecorder) bool {
+		statusOK := w.Code == http.StatusOK
+
+		// Test that the article decoded is same
+
+		var receivedArticle *article
+		err := json.NewDecoder(w.Body).Decode(receivedArticle)
+
+		pageOK := err == nil &&
+			isArticleSame(expectedArticle, receivedArticle)
+
+		fmt.Printf("expected Article %+v, received article: %+v\n", expectedArticle, receivedArticle)
+		return statusOK && pageOK
+	})
+}
+
+func isArticleSame(a, b *article) bool {
+	if a == nil && b == nil {
+		return true
+	}
+	if a == nil || b == nil {
+		return false
+	}
+
+	return a.ID == b.ID && a.Title == b.Title && a.Content == b.Content
 }
