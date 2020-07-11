@@ -41,6 +41,7 @@ func getArticle(c *gin.Context) {
 
 	render(c,
 		gin.H{
+			"id":      article.ID,
 			"title":   article.Title,
 			"content": article.Content,
 		}, "article.html")

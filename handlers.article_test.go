@@ -34,8 +34,8 @@ func TestGetArticleJSON(t *testing.T) {
 	r := getRouter(true)
 
 	articleID := 1
-	route := fmt.Sprintf("/view/article/%d", articleID)
-	r.GET("/article/view/:articleID", showIndexPage)
+	route := fmt.Sprintf("/article/view/%d", articleID)
+	r.GET("/article/view/:articleID", getArticle)
 
 	// Create a request to send to the above route
 	req, _ := http.NewRequest(http.MethodGet, route, nil)
@@ -48,11 +48,11 @@ func TestGetArticleJSON(t *testing.T) {
 
 		// Test that the article decoded is same
 
-		var receivedArticle *article
-		err := json.NewDecoder(w.Body).Decode(receivedArticle)
+		var receivedArticle article
+		err := json.NewDecoder(w.Body).Decode(&receivedArticle)
 
 		pageOK := err == nil &&
-			isArticleSame(expectedArticle, receivedArticle)
+			isArticleSame(expectedArticle, &receivedArticle)
 
 		fmt.Printf("expected Article %+v, received article: %+v\n", expectedArticle, receivedArticle)
 		return statusOK && pageOK
